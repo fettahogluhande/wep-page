@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // GitHub'dan projeyi klonluyoruz
-                git 'https://github.com/fettahogluhande/wep-page.git'
+                git 'https://github.com/fettahogluhande/wep-page'
             }
         }
         
