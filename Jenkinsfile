@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/path/to/npm:${env.PATH}"
+        PATH = "/usr/local/bin:${env.PATH}"
     }
 
     stages {
         stage('Clone Repository') {
-            steps {
+add             steps {
                 git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
             }
         }
