@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // GitHub'dan projeyi klonluyoruz
-                git 'https://github.com/fettahogluhande/wep-page'
+                git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
             }
         }
         
@@ -19,13 +19,14 @@ pipeline {
         stage('Start HTTP Server') {
             steps {
                 // HTTP sunucusunu başlatıyoruz
-                sh 'http-server . -p 8080 &'
+                sh 'nohup http-server . -p 8080 &'
             }
         }
         
         stage('Test') {
             steps {
                 // Sunucunun çalıştığını kontrol ediyoruz
+                sh 'sleep 5' // Sunucunun başlatılması için kısa bir bekleme süresi ekleyin
                 sh 'curl -I http://localhost:8080/index.html'
             }
         }
