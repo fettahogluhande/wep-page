@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Projeyi GitHub'dan çek
-                git 'https://github.com/fettahogluhande/wep-page.git'
+                 git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
             }
         }
 
