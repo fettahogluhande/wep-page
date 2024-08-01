@@ -2,29 +2,36 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
+                // Projeyi GitHub'dan çek
+                git 'https://github.com/fettahogluhande/wep-page.git'
             }
         }
 
-        stage('Pull Docker Image') {
+        stage('Install Dependencies') {
             steps {
                 script {
-                    dockerImage = docker.image('fettahogluhande/wep-page:latest') // Docker Hub'daki image bilgilerinizi buraya ekleyin
-                    dockerImage.pull()
+                    // HTTP sunucusu için gerekli bağımlılıkları yükle
+                    sh 'npm install -g http-server'
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Serve HTML') {
             steps {
                 script {
-                    dockerImage.inside('-p 8080:80') {
-                        // HTTP sunucusunun çalışıp çalışmadığını test etmek için
-                        sh 'sleep 5'
-                        sh 'curl -I http://localhost:8080/index.html'
-                    }
+                    // HTTP sunucusunu başlat
+                    sh 'http-server -p 8080 &'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Basit bir test komutu, bu aşamada daha detaylı testler ekleyebilirsiniz
+                    sh 'curl -I http://localhost:8080'
                 }
             }
         }
@@ -32,7 +39,8 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline tamamlandı.'
+            // Jenkins işini bitirdikten sonra HTTP sunucusunu durdur
+            sh 'pkill http-server || true'
         }
     }
 }
