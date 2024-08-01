@@ -1,18 +1,16 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'fettahogluhande/wep-page'
+            args '-u root:root'
+        }
+    }
 
     stages {
         stage('Clone Repository') {
             steps {
                 // GitHub'dan projeyi klonluyoruz
                 git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
-            }
-        }
-        
-        stage('Install HTTP Server') {
-            steps {
-                // Basit bir HTTP sunucusu kurmak için 'http-server' modülünü yüklüyoruz
-                sh 'npm install -g http-server'
             }
         }
         
