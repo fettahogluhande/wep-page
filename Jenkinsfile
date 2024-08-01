@@ -8,21 +8,20 @@ pipeline {
             }
         }
         
-        // stage('Install Node.js and npm') {
-        //     steps {
-        //         sh '''
-        //         echo "Updating package lists"
-        //         sudo apt-get update
-        //         echo "Setting up Node.js repository"
-        //         curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-        //         echo "Installing Node.js and npm"
-        //         sudo apt-get install -y nodejs
-        //         node -v
-        //         npm -v
-        //         '''
-        //     }
-        // }
-        
+        stage('Install Node.js and npm') {
+            steps {
+                sh '''
+                echo "Updating package lists"
+                apt-get update
+                echo "Setting up Node.js repository"
+                curl -sL https://deb.nodesource.com/setup_18.x | bash -
+                echo "Installing Node.js and npm"
+                apt-get install -y nodejs
+                node -v
+                npm -v
+                '''
+            }
+        }
         
         stage('Install HTTP Server') {
             steps {
