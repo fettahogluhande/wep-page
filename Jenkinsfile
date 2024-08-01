@@ -23,6 +23,7 @@ pipeline {
         //     }
         // }
         
+        
         stage('Install HTTP Server') {
             steps {
                 sh 'npm install -g http-server'
