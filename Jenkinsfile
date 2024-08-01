@@ -7,38 +7,25 @@ pipeline {
                 git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
             }
         }
-        
-        stage('Install Node.js and npm') {
+
+        stage('Pull Docker Image') {
             steps {
-                sh '''
-                echo "Updating package lists"
-                apt-get update
-                echo "Setting up Node.js repository"
-                curl -sL https://deb.nodesource.com/setup_18.x | bash -
-                echo "Installing Node.js and npm"
-                apt-get install -y nodejs
-                node -v
-                npm -v
-                '''
+                script {
+                    dockerImage = docker.image('fettahogluhande/wep-page:latest') // Docker Hub'daki image bilgilerinizi buraya ekleyin
+                    dockerImage.pull()
+                }
             }
         }
-        
-        stage('Install HTTP Server') {
+
+        stage('Run Docker Container') {
             steps {
-                sh 'npm install -g http-server'
-            }
-        }
-        
-        stage('Start HTTP Server') {
-            steps {
-                sh 'nohup http-server . -p 8080 &'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                sh 'sleep 5'
-                sh 'curl -I http://localhost:8080/index.html'
+                script {
+                    dockerImage.inside('-p 8080:80') {
+                        // HTTP sunucusunun çalışıp çalışmadığını test etmek için
+                        sh 'sleep 5'
+                        sh 'curl -I http://localhost:8080/index.html'
+                    }
+                }
             }
         }
     }
