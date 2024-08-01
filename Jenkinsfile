@@ -2,53 +2,40 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                // Projeyi GitHub'dan çek
+                // GitHub'dan projeyi klonluyoruz
                 git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
             }
         }
-
-        // stage('Check Node and npm') {
-        //     steps {
-        //         sh 'node -v'
-        //         sh 'npm -v'
-        //     }
-        // }
-
-        // stage('Install Dependencies') {
-        //     steps {
-        //         script {
-        //             // HTTP sunucusu için gerekli bağımlılıkları yükle
-        //             sh 'npm cache clean --force'
-        //             sh 'sudo npm install -g http-server'
-        //         }
-        //     }
-        // }
-
-        stage('Serve HTML') {
+        
+        stage('Install HTTP Server') {
             steps {
-                script {
-                    // HTTP sunucusunu başlat
-                    sh 'http-server -p 8080 &'
-                }
+                // Basit bir HTTP sunucusu kurmak için 'http-server' modülünü yüklüyoruz
+                sh 'npm install -g http-server'
             }
         }
-
+        
+        stage('Start HTTP Server') {
+            steps {
+                // HTTP sunucusunu başlatıyoruz
+                sh 'nohup http-server . -p 8080 &'
+            }
+        }
+        
         stage('Test') {
             steps {
-                script {
-                    // Basit bir test komutu, bu aşamada daha detaylı testler ekleyebilirsiniz
-                    sh 'curl -I http://localhost:8080'
-                }
+                // Sunucunun çalıştığını kontrol ediyoruz
+                sh 'sleep 5' // Sunucunun başlatılması için kısa bir bekleme süresi ekleyin
+                sh 'curl -I http://34.136.71.21:8080/index.html'
             }
         }
     }
 
     post {
         always {
-            // Jenkins işini bitirdikten sonra HTTP sunucusunu durdur
-            sh 'pkill http-server || true'
+            // Temizlik işlemleri veya bildirimler
+            echo 'Pipeline tamamlandı.'
         }
     }
 }
