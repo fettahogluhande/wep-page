@@ -5,7 +5,14 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Projeyi GitHub'dan çek
-                 git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
+                git url: 'https://github.com/fettahogluhande/wep-page', branch: 'main'
+            }
+        }
+
+        stage('Check Node and npm') {
+            steps {
+                sh 'node -v'
+                sh 'npm -v'
             }
         }
 
@@ -13,7 +20,8 @@ pipeline {
             steps {
                 script {
                     // HTTP sunucusu için gerekli bağımlılıkları yükle
-                    sh 'npm install -g http-server'
+                    sh 'npm cache clean --force'
+                    sh 'sudo npm install -g http-server'
                 }
             }
         }
