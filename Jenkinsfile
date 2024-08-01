@@ -9,22 +9,22 @@ pipeline {
             }
         }
 
-        stage('Check Node and npm') {
-            steps {
-                sh 'node -v'
-                sh 'npm -v'
-            }
-        }
+        // stage('Check Node and npm') {
+        //     steps {
+        //         sh 'node -v'
+        //         sh 'npm -v'
+        //     }
+        // }
 
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    // HTTP sunucusu için gerekli bağımlılıkları yükle
-                    sh 'npm cache clean --force'
-                    sh 'sudo npm install -g http-server'
-                }
-            }
-        }
+        // stage('Install Dependencies') {
+        //     steps {
+        //         script {
+        //             // HTTP sunucusu için gerekli bağımlılıkları yükle
+        //             sh 'npm cache clean --force'
+        //             sh 'sudo npm install -g http-server'
+        //         }
+        //     }
+        // }
 
         stage('Serve HTML') {
             steps {
