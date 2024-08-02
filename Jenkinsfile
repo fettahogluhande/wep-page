@@ -8,9 +8,11 @@ pipeline {
             }
         }
 
-      stage('Code Scan') {
+        stage('Code Scan') {
             steps {
-                snykSecurity organisation: 'fettahogluhande' , projectName: 'wep-page' , severity: 'medium', snykInstallation: 'Snyk', snykTokenId: 'snyk-api-token'
+                withCredentials([string(credentialsId: 'snyk-api-token', variable: 'SNYK_TOKEN')]) {
+                    sh 'snyk test --all-projects'
+                }
             }
         }
 
@@ -22,12 +24,11 @@ pipeline {
             }
         }
 
-  
-       stage('Push Docker Image') {
+        stage('Push Docker Image') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub-credentials') {
+                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
                             dockerImage.push("${env.BUILD_ID}")
                             dockerImage.push("latest")
                         }
@@ -36,19 +37,27 @@ pipeline {
             }
         }
 
-        stage('Deploy to test cluster') {
+        stage('Deploy to Test Cluster') {
             steps {
                 script {
-                        sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" '
-                       
-                        withCredentials([file(credentialsId: 'gcloud-service-account-key', variable: 'GCLOUD_KEY')]) {
-                        sh "gcloud auth activate-service-account --key-file=${GCLOUD_KEY}"
-                        }
+                    // kubectl'yi indir ve çalıştırılabilir hale getir
+                    sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
+                    // sh 'chmod +x kubectl'
+                    // sh 'sudo mv kubectl /usr/local/bin/'
 
-                        sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
-                        sh 'sed -i "s/latest/${BUILD_ID}/g" ./k8s/deployment.yaml'
-                        sh 'kubectl apply -f ./k8s/deployment.yaml'
+                    // Google Cloud kimlik doğrulamasını yap
+                    withCredentials([file(credentialsId: 'gcloud-service-account-key', variable: 'GCLOUD_KEY')]) {
+                        sh "gcloud auth activate-service-account --key-file=${GCLOUD_KEY}"
                     }
+
+                    // GKE kümesine bağlan
+                    sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
+
+                    // Docker image tag'lerini güncelle
+                    sh 'sed -i "s/latest/${env.BUILD_ID}/g" ./k8s/deployment.yaml'
+
+                    // Kubernetes yapılandırmalarını uygula
+                    sh 'kubectl apply -f ./k8s/deployment.yaml'
                 }
             }
         }
