@@ -11,13 +11,13 @@ pipeline {
         }
         
 
-        // stage('Code Scan') {
-        //     steps {
-        //         withCredentials([string(credentialsId: 'snyk-api-token', variable: 'SNYK_TOKEN')]) {
-        //             sh 'snyk test --all-projects'
-        //         }
-        //     }
-        // }
+        stage('Code Scan') {
+            steps {
+                withCredentials([string(credentialsId: 'snyk-api-token', variable: 'SNYK_TOKEN')]) {
+                    sh 'snyk test --all-projects'
+                }
+            }
+        }
 
         stage('Build Docker Image') { 
             steps {
