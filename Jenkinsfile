@@ -4,7 +4,6 @@ pipeline {
     tools {
         nodejs "NodeJS"
         dockerTool "Docker"
-        jdk "JDK11"
     }
 
     stages {
