@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs "NodeJS"
+        dockerTool "Docker"
+        jdk "JDK11"
+    }
+
     stages {
 
         stage('SCM Checkout') {
