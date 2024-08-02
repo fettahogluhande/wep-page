@@ -15,7 +15,12 @@ pipeline {
             }
             // SCM'den kodu çek
         }
-        
+
+        stage('Install Snyk') {
+            steps {
+        sh 'npm install -g snyk'
+            }
+        }
 
         stage('Code Scan') {
             steps {
