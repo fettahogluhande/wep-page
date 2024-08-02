@@ -8,7 +8,13 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') { // Docker image'inizi oluşturmak için bir aşama ekledim
+      stage('Code Scan') {
+            steps {
+                snykSecurity organisation: 'fettahogluhande' , projectName: 'wep-page' , severity: 'medium', snykInstallation: 'Snyk', snykTokenId: 'snyk-api-token'
+            }
+        }
+
+        stage('Build Docker Image') { 
             steps {
                 script {
                     dockerImage = docker.build("fettahogluhande/wep-page:${env.BUILD_ID}")
@@ -16,13 +22,32 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') { // Docker image'inizi Docker Hub'a göndermek için bir aşama ekledim
+  
+       stage('Push Docker Image') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                        docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub-credentials') {
                             dockerImage.push("${env.BUILD_ID}")
+                            dockerImage.push("latest")
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to test cluster') {
+            steps {
+                script {
+                        sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" '
+                       
+                        withCredentials([file(credentialsId: 'gcloud-service-account-key', variable: 'GCLOUD_KEY')]) {
+                        sh "gcloud auth activate-service-account --key-file=${GCLOUD_KEY}"
+                        }
+
+                        sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
+                        sh 'sed -i "s/latest/${BUILD_ID}/g" ./k8s/deployment.yaml'
+                        sh 'kubectl apply -f ./k8s/deployment.yaml'
                     }
                 }
             }
