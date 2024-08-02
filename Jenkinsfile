@@ -33,6 +33,7 @@ pipeline {
         stage('Build Docker Image') { 
             steps {
                 script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     dockerImage = docker.build("fettahogluhande/wep-page:${env.BUILD_ID}")
                 }
             }
@@ -55,20 +56,20 @@ pipeline {
             steps {
                 script {
                     // kubectl'yi indir ve çalıştırılabilir hale getir
-                    sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
+                    //sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
                     // sh 'chmod +x kubectl'
                     // sh 'sudo mv kubectl /usr/local/bin/'
 
                     // Google Cloud kimlik doğrulamasını yap
-                    withCredentials([file(credentialsId: 'gcloud-service-account-key', variable: 'GCLOUD_KEY')]) {
-                        sh "gcloud auth activate-service-account --key-file=${GCLOUD_KEY}"
-                    }
+                    // withCredentials([file(credentialsId: 'gcloud-service-account-key', variable: 'GCLOUD_KEY')]) {
+                    //     sh "gcloud auth activate-service-account --key-file=${GCLOUD_KEY}"
+                    // }
 
                     // GKE kümesine bağlan
-                    sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
+                    //sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
 
                     // Docker image tag'lerini güncelle
-                    sh 'sed -i "s/latest/${env.BUILD_ID}/g" ./k8s/deployment.yaml'
+                    //sh 'sed -i "s/latest/${env.BUILD_ID}/g" ./k8s/deployment.yaml'
 
                     // Kubernetes yapılandırmalarını uygula
                     sh 'kubectl apply -f ./k8s/deployment.yaml'
