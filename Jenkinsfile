@@ -30,34 +30,60 @@ pipeline {
             }
         }
 
-         stage('Install HTTP Server') {
+        stage('Build Docker Image') { 
             steps {
-                // Basit bir HTTP sunucusu kurmak için 'http-server' modülünü yüklüyoruz
-                sh 'npm install -g http-server'
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        dockerImage = docker.build("fettahogluhande/wep-page:${env.BUILD_ID}")
+                    }
+                }
             }
         }
-        
-        stage('Start HTTP Server') {
+
+        stage('Push Docker Image') {
             steps {
-                // HTTP sunucusunu başlatıyoruz
-                sh 'nohup http-server . -p 8080 &'
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub-credentials') {
+                            dockerImage.push("${env.BUILD_ID}")
+                            dockerImage.push("latest")
+                        }
+                    }
+                }
             }
         }
-        
-        stage('Test') {
+
+        stage('Deploy to Test Cluster') {
             steps {
-                // Sunucunun çalıştığını kontrol ediyoruz
-                sh 'sleep 5' // Sunucunun başlatılması için kısa bir bekleme süresi ekleyin
-                sh 'curl -I http://34.136.71.21:8080/index.html'
+                script {
+                    // Kubernetes yapılandırmalarını uygula
+                    sh 'kubectl apply -f ./k8s/deployment.yaml'
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    dockerImage.inside('-p 8080:80') {
+                        // HTTP sunucusunun çalışıp çalışmadığını test etmek için
+                        sh 'sleep 5'
+                        sh 'curl -I http://34.136.71.21:8080/index.html'
+                    }
+                }
             }
         }
     }
 
     post {
         always {
-            // Temizlik işlemleri veya bildirimler
             echo 'Pipeline tamamlandı.'
+        }
+        success {
+            echo 'Pipeline başarıyla tamamlandı.'
+        }
+        failure {
+            echo 'Pipeline başarısız oldu.'
         }
     }
 }
-
