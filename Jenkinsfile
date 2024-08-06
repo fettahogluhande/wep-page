@@ -73,11 +73,7 @@ pipeline {
            
 
                         // Kubeconfig dosyasını Jenkins'den alın
-                        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                        // Kubeconfig dosyasını doğru dizine kopyalayın
-                        sh 'mkdir -p ~/.kube'
-                        sh 'cp $KUBECONFIG ~/.kube/config'
-                        }
+                        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')])
 
                         // Kubernetes kümesi kimlik bilgilerini al
                         sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
