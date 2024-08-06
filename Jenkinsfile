@@ -7,10 +7,6 @@ pipeline {
         snyk "Snyk"
     }
 
-    environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')        
-    }
-
     stages {
 
         stage('SCM Checkout') {
@@ -38,7 +34,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        dockerImage = docker.build("fettahogluhande/wep-page:${env.BUILD_ID}")
+                        dockerImage = docker.build("fettahogluhande/wep-page:latest")
                     }
                 }
             }
