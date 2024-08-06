@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wep-page
-  namespace: wep-page
+  namespace: jenkins
   labels:
     app: wep-page
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: wep-page
-        image: fettahogluhande/wep-page:${env.BUILD_ID}
+        image: fettahogluhande/wep-page:${BUILD_ID}
         ports:
         - containerPort: 8080
 ---
@@ -25,7 +25,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wep-page-service
-  namespace: wep-page
+  namespace: jenkins
 spec:
   type: LoadBalancer
   ports:
