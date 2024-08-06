@@ -65,7 +65,25 @@ pipeline {
             steps {
                 script {
                     // Kubernetes yapılandırmalarını uygula
-                    sh 'kubectl apply -f ./k8s/deployment.yaml'
+                    // sh 'kubectl apply -f ./k8s/deployment.yaml'
+
+                       // Kubectl'yi indir
+                        sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
+                        sh 'chmod +x ./kubectl'
+                        sh 'mv ./kubectl /usr/local/bin/kubectl'
+
+                        // GCloud ile kimlik doğrulaması yap
+                        sh 'gcloud auth activate-service-account --key-file=/path/to/jenkins-key.json'
+
+                        // Kubernetes kümesi kimlik bilgilerini al
+                        sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
+
+            
+                        // Deployment dosyalarını güncelle ve uygula
+                        sh 'sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml'
+                        sh 'kubectl apply -f ./k8s/app-deployment.yaml'
+
+
                 }
             }
         }
