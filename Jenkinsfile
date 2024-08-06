@@ -7,6 +7,10 @@ pipeline {
         snyk "Snyk"
     }
 
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')        
+    }
+
     stages {
 
         stage('SCM Checkout') {
