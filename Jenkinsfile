@@ -33,7 +33,7 @@ pipeline {
         stage('Build Docker Image') { 
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         dockerImage = docker.build("fettahogluhande/wep-page:latest")
                     }
                 }
@@ -43,10 +43,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub-credentials') {
-                            dockerImage.push("${env.BUILD_ID}")
-                            dockerImage.push("latest")
+                    withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        docker.withRegistry('https://registry.hub.docker.com/', 'docker-credentials') {
+                            dockerImage.push("fettahogluhande/wep-page:latest")
                         }
                     }
                 }
@@ -65,7 +64,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    dockerImage.inside('-p 8080:80') {
+                    dockerImage.inside('-p 8082:80') {
                         // HTTP sunucusunun çalışıp çalışmadığını test etmek için
                         sh 'sleep 5'
                         sh 'curl -I http://34.136.71.21:8080/index.html'
