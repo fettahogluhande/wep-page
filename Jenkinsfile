@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+
     tools {
         nodejs "nodejs"
         dockerTool "Docker"
@@ -69,11 +70,14 @@ pipeline {
 
                        // Kubectl'yi indir
                         sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
-                        sh 'chmod +x ./kubectl'
-                        sh 'mv ./kubectl /usr/local/bin/kubectl'
+           
 
-                        // GCloud ile kimlik doğrulaması yap
-                        sh 'gcloud auth activate-service-account --key-file=/path/to/jenkins-key.json'
+                        // Kubeconfig dosyasını Jenkins'den alın
+                        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                        // Kubeconfig dosyasını doğru dizine kopyalayın
+                        sh 'mkdir -p ~/.kube'
+                        sh 'cp $KUBECONFIG ~/.kube/config'
+                        }
 
                         // Kubernetes kümesi kimlik bilgilerini al
                         sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
