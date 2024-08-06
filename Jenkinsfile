@@ -34,34 +34,24 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        dockerImage = docker.build("fettahogluhande/wep-page:latest")
+                        dockerImage = docker.build("fettahogluhande/wep-page:${BUILD_ID}")
                     }
                 }
             }
         }
 
-        // stage('Push Docker Image') {
-        //     steps {
-        //         script {
-        //             withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-        //                 docker.withRegistry('https://registry.hub.docker.com/', 'docker-credentials') {
-        //                     dockerImage.push("fettahogluhande/wep-page:latest")
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+       
 
       stage('Image Scan and Push') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'docker-credentials') {
-                            sh 'docker push fettahogluhande/wep-page:latest'
+                            sh "docker push fettahogluhande/wep-page:${BUILD_ID}"
                         }
                     }
                     withCredentials([string(credentialsId: 'snyk-api-token', variable: 'SNYK_TOKEN')]) {
-                        sh 'snyk test --docker fettahogluhande/wep-page:latest'
+                        sh "snyk test --docker fettahogluhande/wep-page:${BUILD_ID}"
                     }
                 }
             }
