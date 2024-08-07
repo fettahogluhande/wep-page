@@ -72,6 +72,7 @@ pipeline {
                                 gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
                                 
                                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908
+                                cd ./k8s
                                 sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml
                                 kubectl apply -f ./k8s/app-deployment.yaml
                                 '''
