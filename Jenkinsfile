@@ -2,6 +2,9 @@ pipeline {
     agent any
 
     environment {
+        PROJECT_ID = 'devops-project-430908'
+        CLUSTER_NAME = 'cluster-1'
+        ZONE = 'us-central1-c'
         KUBECONFIG = credentials('kubeconfig')
         GOOGLE_CREDENTIALS = credentials('jenkins-key')
     }
@@ -12,13 +15,12 @@ pipeline {
         snyk "Snyk"
     }
 
+    // SCM'den kodu çek
     stages {
-
         stage('SCM Checkout') {
             steps {
                 checkout scm
             }
-            // SCM'den kodu çek
         }
 
         stage('Install Snyk') {
@@ -60,7 +62,6 @@ pipeline {
                         if (snykResult != 0) {
                             echo "Snyk found vulnerabilities. Continuing despite non-critical issues."
                         }
-                        //sh "snyk test --docker fettahogluhande/wep-page:${BUILD_ID}"
                     }
                 }
             }
@@ -81,6 +82,7 @@ pipeline {
                                sh '''
                                 gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
                                 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${ZONE} --project ${PROJECT_ID}
+                                
                     
                                 kubectl apply -f k8s/deployment.yaml
                                 kubectl apply -f k8s/service.yaml
@@ -100,6 +102,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Run Docker Container') {
             steps {
