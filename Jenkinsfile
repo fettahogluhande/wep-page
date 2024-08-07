@@ -82,7 +82,7 @@ pipeline {
                                sh '''
                                
                                 gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
-                                //gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project $PROJECT_ID
+                             
                                 
                     
                                 kubectl apply -f k8s/deployment.yaml
@@ -93,7 +93,7 @@ pipeline {
 
                         // Kubernetes kümesi kimlik bilgilerini al
                         //sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
-
+   //gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project $PROJECT_ID
             
                         // Deployment dosyalarını güncelle ve uygula
                         //sh 'sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml'
