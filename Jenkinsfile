@@ -80,8 +80,9 @@ pipeline {
                         // Kubeconfig dosyasını Jenkins'den alın
                         withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]){
                                sh '''
+                               
                                 gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
-                                gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${ZONE} --project ${PROJECT_ID}
+                                //gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project $PROJECT_ID
                                 
                     
                                 kubectl apply -f k8s/deployment.yaml
