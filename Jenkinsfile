@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        KUBECONFIG = credentials('kubeconfig')
-        GOOGLE_CREDENTIALS = credentials('jenkins-key')
+        GOOGLE_CREDENTIALS = credentials('google-credentials')
     }
 
     tools {
@@ -67,7 +66,6 @@ pipeline {
         stage('Deploy to Test Cluster') {
             steps {
                 script {
-                        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]){
                                sh '''
                                 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
@@ -77,7 +75,7 @@ pipeline {
                                 sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml
                                 kubectl apply -f ./k8s/app-deployment.yaml
                                 '''
-                        }
+                        
                 }
             }
         }
