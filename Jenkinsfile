@@ -70,36 +70,21 @@ pipeline {
         stage('Deploy to Test Cluster') {
             steps {
                 script {
-                    // Kubernetes yapılandırmalarını uygula
-                    // sh 'kubectl apply -f ./k8s/deployment.yaml'
 
                        // Kubectl'yi indir
-                        sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
+                        //sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
            
 
                         // Kubeconfig dosyasını Jenkins'den alın
                         withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]){
                                sh '''
-                               
                                 gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
-                             
-                                
-                    
-                                kubectl apply -f k8s/deployment.yaml
-                                kubectl apply -f k8s/service.yaml
+                                gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908
+                                sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml
+                                kubectl apply -f ./k8s/app-deployment.yaml
                                 '''
                             
                         }
-
-                        // Kubernetes kümesi kimlik bilgilerini al
-                        //sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908'
-   //gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project $PROJECT_ID
-            
-                        // Deployment dosyalarını güncelle ve uygula
-                        //sh 'sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml'
-                        //sh 'kubectl apply -f ./k8s/app-deployment.yaml'
-
-
                 }
             }
         }
