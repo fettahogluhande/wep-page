@@ -80,19 +80,13 @@ pipeline {
             }
         }
 
-
-        stage('Run Docker Container') {
+        stage('Test') {
             steps {
-                script {
-                    dockerImage.inside('-p 8082:80') {
-                        // HTTP sunucusunun çalışıp çalışmadığını test etmek için
-                        sh 'sleep 5'
-                        sh 'curl -I http://34.136.71.21:8080/index.html'
-                    }
-                }
+                sh 'http-server -p 8082'
+                sh 'sudo node selenium_test.js' 
             }
         }
-    }
+
 
     post {
         always {
