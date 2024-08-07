@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         KUBECONFIG = credentials('kubeconfig')
+        GOOGLE_CREDENTIALS = credentials('jenkins-key')
     }
 
     tools {
@@ -66,20 +67,16 @@ pipeline {
         stage('Deploy to Test Cluster') {
             steps {
                 script {
-
-                       // Kubectl'yi indir
-                        //sh 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
-           
-
-                        // Kubeconfig dosyasını Jenkins'den alın
                         withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]){
                                sh '''
-                                curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+                                curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+                                gcloud auth activate-service-account --key-file=devops-project-430908-7f98f933ec5e.json 
+                                
                                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908
                                 sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml
                                 kubectl apply -f ./k8s/app-deployment.yaml
                                 '''
-                            
                         }
                 }
             }
