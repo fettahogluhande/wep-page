@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SERVICE_ACCOUNT = credentials('service-account')
+        GOOGLE_CREDENTIALS = credentials('google-credentials')
     }
 
     tools {
@@ -69,7 +69,7 @@ pipeline {
                                sh '''
                                 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
-                                gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT}
+                                gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
                                 
                                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908
                                 sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml
