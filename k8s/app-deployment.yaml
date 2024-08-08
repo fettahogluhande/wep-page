@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: wep-page
-        image: fettahogluhande/wep-page:${BUILD_ID}
+        image: fettahogluhande/wep-page:latest
         ports:
         - containerPort: 8080
 ---
