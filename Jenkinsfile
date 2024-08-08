@@ -90,9 +90,9 @@ pipeline {
                 sh 'sleep 5'
                 sh 'sudo node selenium_test.js' 
             }
-        }
+        }*/
     }
-*/
+
     post {
         always {
             echo 'Pipeline tamamlandı.'
