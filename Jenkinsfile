@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GOOGLE_CREDENTIALS = credentials('google-credentials')
+        SERVICE_ACCOUNT = credentials('service-account')
     }
 
     tools {
@@ -69,7 +69,7 @@ pipeline {
                                sh '''
                                 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
-                                gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
+                                gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT}
                                 
                                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project devops-project-430908
                                 sed -i "s/latest/${BUILD_NUMBER}/g" ./k8s/app-deployment.yaml
@@ -82,8 +82,8 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'npm start'
-                sh 'sudo node selenium.js' // Selenium testini çalıştırın
+                sh 'http-server -p 8082'
+                sh 'sudo node selenium.js' 
             }
         }
     }
