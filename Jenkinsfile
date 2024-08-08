@@ -85,8 +85,10 @@ pipeline {
 
         stage('Test') {
             steps {
+                sh 'npm install -g http-server'
                 sh 'http-server -p 8082'
-                sh 'sudo node selenium.js' 
+                sh 'sleep 5'
+                sh 'sudo node selenium_test.js' 
             }
         }
     }

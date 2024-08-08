@@ -22,6 +22,6 @@ const { Builder, By } = require('selenium-webdriver');
         await driver.sleep(2000);
     } finally {
         // Tarayıcıyı kapat
-        // await driver.quit();
+        await driver.quit();
     }
 })();
