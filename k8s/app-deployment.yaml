@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wep-page
-  namespace: jenkins
+  namespace: webapp
   labels:
     app: wep-page
 spec:
@@ -25,7 +25,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wep-page-service
-  namespace: jenkins
+  namespace: webapp
 spec:
   type: LoadBalancer
   ports:
