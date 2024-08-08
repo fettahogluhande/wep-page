@@ -82,7 +82,7 @@ pipeline {
                 }
             }
         }
-
+/*
         stage('Test') {
             steps {
                 sh 'npm install -g http-server'
@@ -92,7 +92,7 @@ pipeline {
             }
         }
     }
-
+*/
     post {
         always {
             echo 'Pipeline tamamlandı.'
