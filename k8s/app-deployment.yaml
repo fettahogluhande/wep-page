@@ -33,3 +33,23 @@ spec:
     targetPort: 80
   selector:
     app: wep-page
+---
+apiVersion: v1
+kind: Ingress
+metadata:
+  name: wep-page-ingress
+  namespace: webapp
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: webapp.anka.local  
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wep-page-service
+            port:
+              number: 80
